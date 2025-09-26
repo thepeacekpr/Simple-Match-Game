@@ -12,10 +12,17 @@ public class Singleton<T> : MonoBehaviour
         if (Instance != null)
         {
             Debug.Log($"Instance already assigned");
-            Destroy(gameObject);
             return;
         }
 
         Instance ??= gameObject.GetComponent<T>();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+        }
     }
 }

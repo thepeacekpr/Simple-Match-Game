@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -13,6 +14,7 @@ public class MainMenuManager : MonoBehaviour
 {
     public Image audioButtonImage;
     public TMP_Dropdown difficultyDropdown;
+    public TextMeshProUGUI scoreText;
     public bool canPlayAudio = true;
 
     [Header("<----- Lists ----->")]
@@ -21,15 +23,15 @@ public class MainMenuManager : MonoBehaviour
 
     private GameController m_GameController;
 
-    private void Awake()
-    {
-        SubscribeMethodsButtons();
-    }
+    private void Awake() => SubscribeMethodsButtons();
 
     private void Start()
     {
         m_GameController = GameController.Instance;
         difficultyDropdown.value = m_GameController.difficultyIndex;
+        canPlayAudio = m_GameController.canAudioBePlayed;
+        AudioToggleSpriteChange();
+        GetScoreAndTurns();
     }
 
     private void SubscribeMethodsButtons()
@@ -52,7 +54,8 @@ public class MainMenuManager : MonoBehaviour
     private void OnAudioToggle()
     {
         canPlayAudio = !canPlayAudio;
-        audioButtonImage.sprite = canPlayAudio ? audioToggleSprites[0] : audioToggleSprites[1];
+        m_GameController.canAudioBePlayed = canPlayAudio;
+        AudioToggleSpriteChange();
         m_GameController.OnToggleAudioSources(canPlayAudio);
 
         if (canPlayAudio)
@@ -61,8 +64,18 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
+    private void AudioToggleSpriteChange() => audioButtonImage.sprite = canPlayAudio ? audioToggleSprites[0] : audioToggleSprites[1];
+
     private void OnDropdownValueChange()
     {
         m_GameController.difficultyIndex = difficultyDropdown.value;
+        GetScoreAndTurns();
+    }
+
+    private void GetScoreAndTurns()
+    {
+        scoreText.text =
+            $"{difficultyDropdown.options[difficultyDropdown.value].text}: Score - {PlayerPrefs.GetInt($"Score {difficultyDropdown.value}")}," +
+            $" Tiles Turned - {PlayerPrefs.GetInt($"Tiles Turned {difficultyDropdown.value}")}";
     }
 }

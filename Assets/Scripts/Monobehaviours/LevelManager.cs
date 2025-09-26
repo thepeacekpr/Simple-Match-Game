@@ -1,20 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
 
+using TMPro;
+
 using UnityEngine;
 using UnityEngine.UI;
 
 public class LevelManager : MonoBehaviour
 {
-    public GameObject tilePrefab;
+    public static LevelManager Instance;
+
     public Transform gridHolder;
-    public GridLayoutGroup gridLayoutGroup;
     public Button homeButton;
+    public GameObject endMessage;
+    public TextMeshProUGUI totalTurnsText, tilesMatchedText, scoreText;
 
     [Header("<----- List ----->")]
-    public List<GameObject> tiles = new();
+    public List<GameObject> grids = new();
 
     private GameController m_GameController;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     private void Start()
     {
@@ -36,45 +45,12 @@ public class LevelManager : MonoBehaviour
 
     public void SetGridBasedOnDifficulty()
     {
-        Vector2 spacing = Vector2.zero;
-
-        switch (m_GameController.difficultyIndex)
-        {
-            case 0:
-                spacing = new Vector2(25,25);
-                PopulateTiles(9, 300, spacing);
-                break;
-            case 1:
-                spacing = new Vector2(40,40);
-                PopulateTiles(12, 250, spacing);
-                break;
-            case 2:
-                spacing = new Vector2(30,30);
-                PopulateTiles(15, 200, spacing);
-                break;
-            case 3:
-                spacing = new Vector2(174, 10);
-                PopulateTiles(18, 150, spacing);
-                break;
-            case 4:
-                spacing = new Vector2(10, 100);
-                PopulateTiles(21, 150, spacing);
-                break;
-        }
+        SpawnGrid(m_GameController.difficultyIndex);
     }
 
-    private void PopulateTiles(int tileCount, float cellSize, Vector2 spacing)
+    private void SpawnGrid(int gridIndex)
     {
-        gridLayoutGroup.cellSize = new Vector2(cellSize, cellSize);
-        gridLayoutGroup.spacing = spacing;
-
-        for (int i = 0; i < tileCount; i++)
-        {
-            var tile = Instantiate(tilePrefab, gridHolder);
-            tile.name = $"Tile ({i})";
-            var tileController = tile.GetComponent<TileController>();
-            tileController.SetFruitIcon(m_GameController.tileSprites[0]);
-            tiles.Add(tile);
-        }
+        var grid = Instantiate(grids[gridIndex], gridHolder);
+        m_GameController.currentGridController = grid.GetComponent<GridController>();
     }
 }

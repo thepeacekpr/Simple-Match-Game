@@ -69,6 +69,7 @@ mono_crash.*
 # Builds
 *.apk
 *.aab
+*.exe
 *.unitypackage
 *.unitypackage.meta
 *.app
